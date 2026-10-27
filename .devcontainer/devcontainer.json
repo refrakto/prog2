@@ -1,9 +1,13 @@
 {
    "name": "Projeto Raylib",
-   "build": { "dockerfile": "../Dockerfile" },
+   "build": { "dockerfile": "../dockerfiles/Dockerfile" },
    "customizations": {
       "vscode": {
-         "extensions": ["ms-vscode.cpptools-extension-pack"]
+         "extensions": ["kylinideteam.kylin-clangd"],
+         "settings": {
+            "terminal.integrated.defaultProfile.linux": "bash",
+            "terminal.integrated.profiles.linux": { "bash": { "path": "/bin/bash" } }
+         }
       }
    }
 }
