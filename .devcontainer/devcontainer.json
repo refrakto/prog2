@@ -1,6 +1,6 @@
 {
    "name": "Projeto Raylib",
-   "build": { "dockerfile": "../dockerfiles/Dockerfile" },
+   "build": { "dockerfile": "../.dockerfiles/Dockerfile" },
    "customizations": {
       "vscode": {
          "extensions": ["kylinideteam.kylin-clangd"],
