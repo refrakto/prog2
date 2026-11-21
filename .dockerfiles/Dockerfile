@@ -41,16 +41,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Build raylib from source: once for Linux, once for Windows (UCRT64).
-ARG RAYLIB_VERSION=5.5
-COPY .dockerfiles/build-raylib.sh /tmp/build-raylib.sh
+ARG RAYLIB_VERSION=6.2
+COPY build-raylib.sh /tmp/build-raylib.sh
 RUN bash /tmp/build-raylib.sh "${RAYLIB_VERSION}" \
     && rm /tmp/build-raylib.sh
 
-# Non-root user
-ARG USERNAME=vscode
-RUN useradd -m -s /bin/bash ${USERNAME} \
-    && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
-    && chmod 0440 /etc/sudoers.d/${USERNAME}
-
-USER ${USERNAME}
 WORKDIR /workspaces
+
+RUN chown -R "$(id -u):$(id -g)" /workspaces

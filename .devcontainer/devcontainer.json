@@ -6,11 +6,23 @@
    },
    "customizations": {
       "vscode": {
-         "extensions": ["kylinideteam.kylin-clangd"],
+         "extensions": [
+            "kylinideteam.kylin-clangd",
+            "ms-vscode.makefile-tools",
+            "ms-vscode-remote.remote-containers",
+            "ms-azuretools.vscode-containers",
+            "docker.docker"
+         ],
          "settings": {
             "terminal.integrated.defaultProfile.linux": "bash",
             "terminal.integrated.profiles.linux": { "bash": { "path": "/bin/bash" } }
          }
+      }
+   },
+   "features": {
+      "ghcr.io/devcontainers/features/docker-outside-of-docker": {
+         "installDockerBuildx": true,
+         "moby": false
       }
    }
 }
