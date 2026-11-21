@@ -20,3 +20,22 @@ Se estiver no WSL ou no Linux, rode `./build.sh`
 >Apenas compila os binários do seu sistema.
 
 Em seu terminal, rode `make`. Os binários resultantes estarão na pasta `saida`.
+
+# Desenvolver
+
+Para configurar o seu ambiente de desenvolvimento, tenha:
+- WSL (Se estiver no Windows)
+- Docker
+- Docker Buildx Plugin
+- VSCode
+
+> OBS: Para Windows, de preferência, clone o repositório no WSL, instale o Docker e o Buildx no WSL, e clone o repositório dentro do WSL.
+
+1. Clone o repositório.
+2. Abra a pasta do repositório no VSCode.
+3. Instale a extensão [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) em seu VSCode.
+4. Pressione `Ctrl+Shift+P` para abrir a Paleta de Comandos, procure por `Dev Containers: Reabrir no Contêiner` e selecione esse comando.
+
+Espere o Contêiner compilar.
+
+Para compilar para o desenvolvimento, rode no terminal `make run`. Para compilar uma versão finalizada, rode apenas `make`.
