@@ -1,4 +1,5 @@
 #include "LeitorMapas.c"
+#include <raylib.h>
 
 int main(){
     char nomeMapa[] = "../include/mapas/mapa1.txt";
