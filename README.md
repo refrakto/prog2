@@ -8,7 +8,7 @@
 >>
 > Esse método compila os binários para Windows e Linux.
 
-Se estiver no Windows, clique no arquivo `build.cmd`.
+Se estiver no Windows, clique no arquivo `build.cmd`. Se o Docker no Windows falhar, o script tenta executar o mesmo comando pelo WSL (com Docker configurado nele).
 Se estiver no WSL ou no Linux, rode `./build.sh`
 
 ## 2. Compilar pelo Make

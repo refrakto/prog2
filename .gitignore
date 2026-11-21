@@ -49,6 +49,7 @@ saida/
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+!build.cmd
 .tmp_versions/
 modules.order
 Module.symvers
