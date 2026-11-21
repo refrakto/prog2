@@ -21,14 +21,23 @@ typedef struct {
     char **terreno;
     int tempoLimite;
     Posicao jogadorInicial;
+    Posicao saida;
     Posicao zumbis[MAX_ENTIDADES];
     int qtdZumbis;
     KitMapa kits[MAX_ENTIDADES];
     int qtdKits;
+    int portoesAbertos;
 } DadosMapa;
 
-// Carrega o mapa, separa as entidades do terreno e preenche DadosMapa.
-int carregarMapa(const char *caminhoArquivo, DadosMapa *dados);
+// Tenta abrir "mapaX.txt" na raiz; se não achar, tenta "include/mapas/mapaX.txt".
+// Retorna 1 se carregou com sucesso, 0 se não encontrou ou deu erro.
+int carregarFase(int numeroFase, DadosMapa *dados);
+
+// Verifica se o jogador ou zumbi pode pisar naquela casa (1 = livre, 0 = bloqueado).
+int ehAndavel(const DadosMapa *dados, int linha, int coluna);
+
+// Alterna os portões 'D' entre fechados (0) e abertos (1).
+void alternarPortoes(DadosMapa *dados);
 
 // Desenha o mapa 20x40 na janela Raylib (cada bloco 40x40px).
 void desenharMapa(const DadosMapa *dados, int offsetTopoY);

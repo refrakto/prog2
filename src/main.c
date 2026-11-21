@@ -4,36 +4,52 @@
 
 int main(void) {
     int faseAtual = 1;
-    char caminhoMapa[128];
+    int jogoZerado = 0;
     DadosMapa mapa;
 
-    snprintf(caminhoMapa, sizeof(caminhoMapa), "include/mapas/mapa%d.txt", faseAtual);
-
-    if (!carregarMapa(caminhoMapa, &mapa)) {
-        printf("Erro ao carregar %s\n", caminhoMapa);
+    if (!carregarFase(faseAtual, &mapa)) {
+        printf("Erro critico: mapa1.txt nao encontrado ou invalido!\n");
         return 1;
     }
 
-    // Janela exigida: 1600x880 (80px no topo para placar + 800px para o mapa 20x40)
-    InitWindow(1600, 880, "Projeto Prog2 - Teste de Mapa");
+    InitWindow(1600, 880, "Projeto Prog2 - Teste das 3 Fases");
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
+        // Aperte N para testar a troca automatica de fase (1 -> 2 -> 3 -> Vitoria)
+        if (!jogoZerado && IsKeyPressed(KEY_N)) {
+            liberarMapa(&mapa);
+            faseAtual++;
+            if (!carregarFase(faseAtual, &mapa)) {
+                jogoZerado = 1;
+            }
+        }
+
+        // Aperte P para testar abrir/fechar portoes D
+        if (!jogoZerado && IsKeyPressed(KEY_P)) {
+            alternarPortoes(&mapa);
+        }
+
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // Barra superior (HUD provisória)
-        DrawText(TextFormat("Fase: %d | Tempo: %ds | Zumbis: %d | Kits: %d",
-                            faseAtual, mapa.tempoLimite, mapa.qtdZumbis, mapa.qtdKits),
-                 20, 25, 25, WHITE);
+        if (jogoZerado) {
+            DrawText("PARABENS! TODAS AS FASES FORAM CONCLUIDAS!", 340, 400, 35, GREEN);
+            DrawText("Pressione ESC para sair", 620, 460, 22, LIGHTGRAY);
+        } else {
+            DrawText(TextFormat("Fase: %d | Tempo: %ds | Zumbis: %d | Kits: %d  [N: Prox Fase | P: Portoes]",
+                                faseAtual, mapa.tempoLimite, mapa.qtdZumbis, mapa.qtdKits),
+                     20, 25, 22, WHITE);
 
-        // Desenha o mapa começando no Y = 80
-        desenharMapa(&mapa, 80);
+            desenharMapa(&mapa, 80);
+        }
 
         EndDrawing();
     }
 
     CloseWindow();
-    liberarMapa(&mapa);
+    if (!jogoZerado) {
+        liberarMapa(&mapa);
+    }
     return 0;
 }

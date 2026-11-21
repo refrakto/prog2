@@ -15,9 +15,7 @@ void liberarMapa(DadosMapa *dados) {
     dados->terreno = NULL;
 }
 
-int carregarMapa(const char *caminhoArquivo, DadosMapa *dados) {
-    if (dados == NULL) return 0;
-
+static int lerArquivoMapa(const char *caminhoArquivo, DadosMapa *dados) {
     FILE *arquivo = fopen(caminhoArquivo, "r");
     if (arquivo == NULL) {
         return 0;
@@ -26,8 +24,11 @@ int carregarMapa(const char *caminhoArquivo, DadosMapa *dados) {
     dados->terreno = NULL;
     dados->qtdZumbis = 0;
     dados->qtdKits = 0;
+    dados->portoesAbertos = 0;
     dados->jogadorInicial.linha = -1;
     dados->jogadorInicial.coluna = -1;
+    dados->saida.linha = -1;
+    dados->saida.coluna = -1;
 
     if (fscanf(arquivo, "%d", &dados->tempoLimite) != 1 || dados->tempoLimite <= 0) {
         fclose(arquivo);
@@ -54,7 +55,7 @@ int carregarMapa(const char *caminhoArquivo, DadosMapa *dados) {
         }
     }
 
-    char linhaBuffer[128];
+char linhaBuffer[MAX_ENTIDADES];
     for (int i = 0; i < MAPA_LINHAS; i++) {
         if (fgets(linhaBuffer, sizeof(linhaBuffer), arquivo) == NULL) {
             liberarMapa(dados);
@@ -94,6 +95,10 @@ int carregarMapa(const char *caminhoArquivo, DadosMapa *dados) {
                 }
                 dados->terreno[i][j] = ' ';
             } else {
+                if (ch == 'S') {
+                    dados->saida.linha = i;
+                    dados->saida.coluna = j;
+                }
                 dados->terreno[i][j] = ch;
             }
         }
@@ -101,7 +106,47 @@ int carregarMapa(const char *caminhoArquivo, DadosMapa *dados) {
     }
 
     fclose(arquivo);
+
+    // Validação obrigatória: todo mapa precisa ter Jogador (P) e Saída (S)
+    if (dados->jogadorInicial.linha == -1 || dados->saida.linha == -1) {
+        liberarMapa(dados);
+        return 0;
+    }
+
     return 1;
+}
+
+int carregarFase(int numeroFase, DadosMapa *dados) {
+    if (dados == NULL || numeroFase <= 0) return 0;
+
+    char caminho[MAX_ENTIDADES];
+
+    // 1. Tenta primeiro na pasta raiz de execução (padrão da avaliação)
+    snprintf(caminho, sizeof(caminho), "mapa%d.txt", numeroFase);
+    if (lerArquivoMapa(caminho, dados)) {
+        return 1;
+    }
+
+    // 2. Se não achar na raiz, tenta na pasta include/mapas/
+    snprintf(caminho, sizeof(caminho), "include/mapas/mapa%d.txt", numeroFase);
+    return lerArquivoMapa(caminho, dados);
+}
+
+int ehAndavel(const DadosMapa *dados, int linha, int coluna) {
+    if (dados == NULL || dados->terreno == NULL) return 0;
+    if (linha < 0 || linha >= MAPA_LINHAS || coluna < 0 || coluna >= MAPA_COLUNAS) return 0;
+
+    char celula = dados->terreno[linha][coluna];
+    if (celula == '#') return 0;
+    if (celula == 'D' && !dados->portoesAbertos) return 0;
+
+    return 1;
+}
+
+void alternarPortoes(DadosMapa *dados) {
+    if (dados != NULL) {
+        dados->portoesAbertos = !dados->portoesAbertos;
+    }
 }
 
 void desenharMapa(const DadosMapa *dados, int offsetTopoY) {
@@ -113,7 +158,6 @@ void desenharMapa(const DadosMapa *dados, int offsetTopoY) {
             int posY = offsetTopoY + (i * TAMANHO_BLOCO);
             char celula = dados->terreno[i][j];
 
-            // Fundo padrão (chão livre)
             DrawRectangle(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, RAYWHITE);
             DrawRectangleLines(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, LIGHTGRAY);
 
@@ -129,8 +173,12 @@ void desenharMapa(const DadosMapa *dados, int offsetTopoY) {
                 DrawRectangle(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, GOLD);
                 DrawText("C", posX + 12, posY + 10, 20, ORANGE);
             } else if (celula == 'D') {
-                DrawRectangle(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, BROWN);
-                DrawText("D", posX + 12, posY + 10, 20, WHITE);
+                if (dados->portoesAbertos) {
+                    DrawRectangleLines(posX + 2, posY + 2, TAMANHO_BLOCO - 4, TAMANHO_BLOCO - 4, BROWN);
+                } else {
+                    DrawRectangle(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, BROWN);
+                    DrawText("D", posX + 12, posY + 10, 20, WHITE);
+                }
             } else if (celula == 'S') {
                 DrawRectangle(posX, posY, TAMANHO_BLOCO, TAMANHO_BLOCO, PURPLE);
                 DrawText("S", posX + 12, posY + 10, 20, WHITE);
