@@ -1,0 +1,40 @@
+FROM debian:trixie-slim AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc-mingw-w64-ucrt64 \
+        g++-mingw-w64-ucrt64 \
+        binutils-mingw-w64-ucrt64 \
+        libasound2-dev \
+        libx11-dev \
+        libxrandr-dev \
+        libxi-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+        libxcursor-dev \
+        libxinerama-dev \
+        libwayland-dev \
+        libxkbcommon-dev \
+        cmake \
+        ninja-build \
+        pkgconf \
+        ca-certificates \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG RAYLIB_VERSION=6.2
+COPY build-raylib.sh /tmp/build-raylib.sh
+RUN bash /tmp/build-raylib.sh "${RAYLIB_VERSION}" \
+    && rm /tmp/build-raylib.sh
+
+WORKDIR /workspace
+COPY makefile ./makefile
+COPY src ./src
+COPY include ./include
+RUN make all \
+    && make PLATFORM=mingw all
+
+FROM scratch AS export
+COPY --from=build /workspace/saida/ /saida/
