@@ -23,6 +23,8 @@ Em seu terminal, rode `make`. Os binários resultantes estarão na pasta `saida`
 
 # Desenvolver
 
+## Iniciando Ambiente de Desenvolvimento
+
 Para configurar o seu ambiente de desenvolvimento, tenha:
 - WSL (Se estiver no Windows)
 - Docker
@@ -39,3 +41,16 @@ Para configurar o seu ambiente de desenvolvimento, tenha:
 Espere o Contêiner compilar.
 
 Para compilar para o desenvolvimento, rode no terminal `make run`. Para compilar uma versão finalizada, rode apenas `make`.
+
+## Estrutura do Repositório
+
+- .devcontainer, .dockerfiles, .vscode: configurações do ambiente de desenvolvimento.
+- build: diretório de cache de compilação.
+- saida: diretório dos executáveis compilados.
+- src: diretório do código-fonte.
+
+### Como estruturar o código?
+
+Exceto a `main.c`, todo arquivo `*.c` tem seu devido `*.h` localizado na mesma pasta. \
+Nenhum código pode importar diretamente os arquivos `*.c`, somente `*.h`. \
+Todo código deve estar dentro de src, ou dentro de qualquer pasta criada dentro de src.
