@@ -1,25 +1,39 @@
 #include <stdio.h>
+#include "raylib.h"
 #include "../include/LeitorMapas.h"
 
 int main(void) {
     int faseAtual = 1;
-    int tempoLimite = 0;
     char caminhoMapa[128];
+    DadosMapa mapa;
 
     snprintf(caminhoMapa, sizeof(caminhoMapa), "include/mapas/mapa%d.txt", faseAtual);
 
-    char **mapa = carregarMapa(caminhoMapa, &tempoLimite);
-    if (mapa == NULL) {
-        printf("Erro ao abrir ou ler o arquivo: %s\n", caminhoMapa);
+    if (!carregarMapa(caminhoMapa, &mapa)) {
+        printf("Erro ao carregar %s\n", caminhoMapa);
         return 1;
     }
 
-    printf("Mapa %d carregado com sucesso! Tempo: %d segundos.\n\n", faseAtual, tempoLimite);
+    // Janela exigida: 1600x880 (80px no topo para placar + 800px para o mapa 20x40)
+    InitWindow(1600, 880, "Projeto Prog2 - Teste de Mapa");
+    SetTargetFPS(60);
 
-    for (int i = 0; i < MAPA_LINHAS; i++) {
-        printf("%s\n", mapa[i]);
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Barra superior (HUD provisória)
+        DrawText(TextFormat("Fase: %d | Tempo: %ds | Zumbis: %d | Kits: %d",
+                            faseAtual, mapa.tempoLimite, mapa.qtdZumbis, mapa.qtdKits),
+                 20, 25, 25, WHITE);
+
+        // Desenha o mapa começando no Y = 80
+        desenharMapa(&mapa, 80);
+
+        EndDrawing();
     }
 
-    liberarMapa(mapa);
+    CloseWindow();
+    liberarMapa(&mapa);
     return 0;
 }
