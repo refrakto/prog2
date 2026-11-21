@@ -1,12 +1,25 @@
-#include "LeitorMapas.c"
+#include <stdio.h>
+#include "../include/LeitorMapas.h"
 
-int main(){
-    char nomeMapa[] = "../include/mapas/mapa1.txt";
-    char **mapa;
-    int tempo; //Iniciializa a variável tempo para armazenar o tempo lido do arquivo na função lerMapas
-    int linhas = 20, colunas = 40;
-    if(!lerMapas(nomeMapa, mapa, &tempo, linhas, colunas)){
-        return -1;
+int main(void) {
+    int faseAtual = 1;
+    int tempoLimite = 0;
+    char caminhoMapa[128];
+
+    snprintf(caminhoMapa, sizeof(caminhoMapa), "include/mapas/mapa%d.txt", faseAtual);
+
+    char **mapa = carregarMapa(caminhoMapa, &tempoLimite);
+    if (mapa == NULL) {
+        printf("Erro ao abrir ou ler o arquivo: %s\n", caminhoMapa);
+        return 1;
     }
+
+    printf("Mapa %d carregado com sucesso! Tempo: %d segundos.\n\n", faseAtual, tempoLimite);
+
+    for (int i = 0; i < MAPA_LINHAS; i++) {
+        printf("%s\n", mapa[i]);
+    }
+
+    liberarMapa(mapa);
     return 0;
 }
