@@ -34,8 +34,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         clangd \
         # Source control, shell, certificates, and privilege utility
         ca-certificates \
+        curl \
         git \
         git-lfs \
+        jq \
+        xz-utils \
         bash \
         sudo \
     && rm -rf /var/lib/apt/lists/*
