@@ -21,7 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ninja-build \
         pkgconf \
         ca-certificates \
+        curl \
         git \
+        jq \
+        xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
 ARG RAYLIB_VERSION=6.2
@@ -33,7 +36,9 @@ WORKDIR /workspace
 COPY makefile ./makefile
 COPY src ./src
 COPY include ./include
-RUN make all \
+RUN C_INCLUDE_PATH=/opt/obggcc/x86_64-unknown-linux-gnu2.31/usr/include \
+    LIBRARY_PATH=/opt/obggcc/x86_64-unknown-linux-gnu2.31/usr/lib \
+    make CC=/opt/obggcc/bin/x86_64-unknown-linux-gnu2.31-gcc all \
     && make PLATFORM=mingw all
 
 FROM scratch AS export
